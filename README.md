@@ -23,14 +23,17 @@
 
 -   3.**初始化Facepp**    
 
-&emsp; 在[facepp](https://console.faceplusplus.com.cn/login) 中注册用户，找到key和secretkey并替换facepp.py文件中的<Your faceplusplus key\>和<Your faceplusplus secret key\> 完成后在当前命令行中      
-  
+&emsp; 在[facepp](https://console.faceplusplus.com.cn/login) 中注册用户，找到key和secretkey并替换facepp.py文件中的<Your faceplusplus key\>和<Your faceplusplus secret key\> &emsp;  此时需要一些人脸图片作为数据集，可以直接向candidate_faces文件夹中添加一些图片(格式为 姓名_学号_班级.jpg)，也可以输入 
+```
+    python3 fast_recognition_face.py
+```        
+&emsp;  在人脸录入模块录入人脸数据，完成后在当前命令行中
 ```
     python3 facepp.py
 ```   
 &emsp;  该命令将创建candidate_faces中所有人脸的face_token(图片标识)，这些face_token组成一个faceset，也就是人脸的数据集，当摄像头捕捉到人脸时，则会和faceset中的人脸比较。   
    
-&emsp;  (可以直接向candidate_faces文件夹中添加一些图片(格式为 姓名_学号_班级.jpg)，也可以 `python3 fast_recognition_face.py` 在人脸录入模块录入)
+
 
 
 ### Good Luck!  
