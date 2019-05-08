@@ -1,12 +1,9 @@
-dlib==19.8.1
 numpy==1.13.1+mkl
 opencv-python==4.1.0.25
 pandas==0.24.2
 Pillow==6.0.0
 PyQt5==5.12.1
-PyQt5-sip==4.19.15
 requests==2.21.0
 scikit-image==0.15.0
-scikit-learn==0.19.1
 scipy==0.19.1
-six==1.10.0
+dlib==19.8.1

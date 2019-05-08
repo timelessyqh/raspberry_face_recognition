@@ -52,12 +52,11 @@ class MainWindow(QWidget):
         self.slot_init()  # 初始化信号槽
         self.btn_flag = 0  # 开关变量
         self.local_data = []
+        self.face_flag=''
     def set_ui(self):
         # 布局设置
         self.layout_main = QHBoxLayout()  # 整体框架是水平布局
         self.layout_button = QVBoxLayout()
-
-
 
         #欢迎词
         # self.label_welcome = QLabel('欢迎进入课堂考勤界面  Powered by tyut')
@@ -219,17 +218,19 @@ class MainWindow(QWidget):
             secret = "JJu5i4996N4YKlhUYv9xF2o9y-KsX8eQ"
             if search_faceset(key,secret,'now.jpg') != 0:
                 res = facetoken_name(search_faceset(key,secret,'now.jpg'))
-                print("匹配成功，data：%s"%res)
-                Time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-                conn,cursor=connect_sqlite()
-                cursor.execute('insert into attend_log (name,number,class,time) values ("%s","%s","%s","%s")'%(res[0],res[1],res[2],Time))
-                disconnect_sqlite(conn,cursor)
-                infoBox = QMessageBox(self)
-                infoBox.setText(u"打卡成功！\n姓名：%s\n学号：%s\n班级：%s\n时间：%s\n\n3秒后自动退出"%(res[0],res[1],res[2],Time))
-                infoBox.setWindowTitle("Success")
-                infoBox.setStandardButtons(QMessageBox.Ok)
-                infoBox.button(QMessageBox.Ok).animateClick(3 * 1000)
-                infoBox.exec_()
+                if self.face_flag=='' or self.face_flag!=res:
+                    print("匹配成功，data：%s"%res)
+                    Time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+                    conn,cursor=connect_sqlite()
+                    cursor.execute('insert into attend_log (name,number,class,time) values ("%s","%s","%s","%s")'%(res[0],res[1],res[2],Time))
+                    disconnect_sqlite(conn,cursor)
+                    infoBox = QMessageBox(self)
+                    infoBox.setText(u"打卡成功！\n姓名：%s\n学号：%s\n班级：%s\n时间：%s\n\n3秒后自动退出"%(res[0],res[1],res[2],Time))
+                    infoBox.setWindowTitle("Success")
+                    infoBox.setStandardButtons(QMessageBox.Ok)
+                    infoBox.button(QMessageBox.Ok).animateClick(3 * 1000)
+                    infoBox.exec_()
+                    self.face_flag=res
             # print("打卡成功，信息%s"%res)
             # time.sleep(10)
 
@@ -296,8 +297,6 @@ class MainWindow(QWidget):
                 addimage_faceset(filepath)
             elif ok and len(name)<=5:
                 QMessageBox.information(self,u"警告",u"输入长度过小",QMessageBox.Yes)
-
-
 
 
     def closeEvent(self, QCloseEvent):

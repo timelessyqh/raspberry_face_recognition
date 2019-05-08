@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import urllib.request
-import urllib.error
+import urllib.error,linecache
 import time,json,os,requests
-from manage_face import connect_sqlite,disconnect_sqlite
+from manage_face import connect_sqlite,disconnect_sqlite,delete_table,select_sqlite
 
 
 def facetoken_name(face_token):
@@ -14,7 +14,7 @@ def facetoken_name(face_token):
         Dict[i[0]]=list(i[1:])
     disconnect_sqlite(conn,cursor)
     return Dict[face_token]
-def get_facetoken(filepath,key="jiI3N4HcEAnXn-YS0BXUEkOY51dDQgQg",secret="JJu5i4996N4YKlhUYv9xF2o9y-KsX8eQ"):
+def get_facetoken(filepath,key="<Your faceplusplus key>",secret="<Your faceplusplus secret key>"):
     http_url = 'https://api-cn.faceplusplus.com/facepp/v3/detect'
     boundary = '----------%s' % hex(int(time.time() * 1000))
     data = []
@@ -81,11 +81,13 @@ def create_faceset(key,secret):  #生成人脸识别中的faceset，之后利用
 
     response = requests.post(http_url, data=data)
     faceset_token = json.loads(response.content.decode('utf-8'))['faceset_token']
+    with open('faceset','wb') as f:
+        f.write(faceset_token.encode())
     return faceset_token
 
 def add_faceset(key,secret): #在生成的faceset中加入face_token，并返回
     http_url =' https://api-cn.faceplusplus.com/facepp/v3/faceset/addface'
-    faceset_token="a27c0202a32d6ee4102563cf9fc005d2"
+    faceset_token=linecache.getline('faceset',1).strip('\n')
     conn,cursor = connect_sqlite()
     cursor.execute("select name,number,class,facetoken from people_facetoken")
 
@@ -96,7 +98,7 @@ def add_faceset(key,secret): #在生成的faceset中加入face_token，并返回
         print(json.loads(response.content.decode('utf-8'))['face_count']) 
     # return res 
 
-def addimage_faceset(filepath,key="jiI3N4HcEAnXn-YS0BXUEkOY51dDQgQg",secret="JJu5i4996N4YKlhUYv9xF2o9y-KsX8eQ"): #在目前有的faceset中加入新录入人脸的facetoken
+def addimage_faceset(filepath,key="<Your faceplusplus key>",secret="<Your faceplusplus secret key>"): #在目前有的faceset中加入新录入人脸的facetoken
     Facetoken = get_facetoken(filepath)
     res = filepath.strip('.jpg').split('/')[1].split('_')
     Name,Number,Class,Time = res[0],res[1],res[2],time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
@@ -106,7 +108,7 @@ def addimage_faceset(filepath,key="jiI3N4HcEAnXn-YS0BXUEkOY51dDQgQg",secret="JJu
     disconnect_sqlite(conn,cursor)
 
     http_url =' https://api-cn.faceplusplus.com/facepp/v3/faceset/addface'
-    faceset_token="a27c0202a32d6ee4102563cf9fc005d2"
+    faceset_token=linecache.getline('faceset',1).strip('\n')
 
     data = {"api_key":key,"api_secret":secret,"faceset_token":faceset_token,"face_tokens":Facetoken}
     response = requests.post(http_url,data=data)
@@ -114,7 +116,7 @@ def addimage_faceset(filepath,key="jiI3N4HcEAnXn-YS0BXUEkOY51dDQgQg",secret="JJu
 
 def getdetail_faceset(key,secret):  #获取faceset详细信息
     http_url ='https://api-cn.faceplusplus.com/facepp/v3/faceset/getdetail'
-    faceset_token="a27c0202a32d6ee4102563cf9fc005d2"
+    faceset_token=linecache.getline('faceset',1).strip('\n')
 
     data = {"api_key":key,"api_secret":secret,"faceset_token":faceset_token}
     response = requests.post(http_url,data=data)
@@ -122,7 +124,7 @@ def getdetail_faceset(key,secret):  #获取faceset详细信息
 
 def search_faceset(key,secret,file_path):
     http_url ='https://api-cn.faceplusplus.com/facepp/v3/search'
-    faceset_token="a27c0202a32d6ee4102563cf9fc005d2"
+    faceset_token=linecache.getline('faceset',1).strip('\n')
     image_file = {"image_file":open(file_path,"rb")}
     # test_token = 'c127a905d2cc29a7f2ac191cdc1bc043'
     data = {"api_key":key,"api_secret":secret,"faceset_token":faceset_token}
@@ -138,13 +140,30 @@ def search_faceset(key,secret,file_path):
             print("匹配失败，最像token：%s"%face_token)
     except:
         return 0
-if __name__ == '__main__':
-    key = "jiI3N4HcEAnXn-YS0BXUEkOY51dDQgQg"
-    secret = "JJu5i4996N4YKlhUYv9xF2o9y-KsX8eQ"
+def main():
+    key = "<Your faceplusplus key>"
+    secret = "<Your faceplusplus secret key>"
     # save_facetoken()
     # create_faceset(key,secret)
     # add_faceset(key,secret)
     # getdetail_faceset(key,secret)
     # search_faceset(key,secret,'test.jpg')
     # facetoken_name(face_token)
-    addimage_faceset('candidate-faces/范冰冰_201549865_1544.jpg')
+    # addimage_faceset('candidate-faces/范冰冰_201549865_1544.jpg')
+    # print(linecache.getline('faceset',1).strip('\n'))
+    # addimage_faceset('candidate-faces/范冰冰_201549865_1544.jpg')
+    try:
+        delete_table('people_facetoken')
+    except Exception as e:
+        print(e)
+    print('Creating faceset............')
+    create_faceset(key,secret)
+    print('Import image file from candidate-faces........')
+    save_facetoken()
+    print('Success, already save to people_facetoken\nBegin to add facetokens to faceset..........')
+    add_faceset(key,secret)
+    print('Success!')
+
+if __name__ == '__main__':
+    main()
+

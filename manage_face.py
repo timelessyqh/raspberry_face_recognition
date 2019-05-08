@@ -31,6 +31,13 @@ def create_table():     ##需要先创建表
     conn.commit()
     conn.close()
 
+def delete_table(tablename):     ##需要先创建表
+    conn,cursor=connect_sqlite()
+    cursor.execute('delete from %s'%tablename)
+    cursor.close()
+    conn.commit()
+    conn.close()
+
 def select_sqlite(dbname='rsipberry.db'):
     import sqlite3
     conn = sqlite3.connect(dbname)
