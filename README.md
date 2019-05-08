@@ -42,8 +42,12 @@
     python3 manage_face.py
 ```   
      
--   5.**运行结果截图**
-pic1.png pic2.png
+-   5.**运行结果截图**    
+**fast_face_recognition.py:**   
+![系统运行图](https://github.com/timelessyqh/raspberry_face_recognition/blob/master/images/pic1.png)   
+
+**manage_face.py:**   
+![后台运行图](https://github.com/timelessyqh/raspberry_face_recognition/blob/master/images/pic2.png)
 
 
 
