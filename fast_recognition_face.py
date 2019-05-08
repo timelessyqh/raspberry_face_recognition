@@ -214,8 +214,9 @@ class MainWindow(QWidget):
             now_save_path = os.path.join(os.path.dirname(os.path.abspath('__file__')),
                                        'now.jpg')
             self.showImage.save(now_save_path)         ##截图，当前摄像头的图像保存为now()
-            key = "jiI3N4HcEAnXn-YS0BXUEkOY51dDQgQg"
-            secret = "JJu5i4996N4YKlhUYv9xF2o9y-KsX8eQ"
+            
+            key = "<your faceplusplus key>"
+            secret = "<your faceplusplus secretkey>"
             if search_faceset(key,secret,'now.jpg') != 0:
                 res = facetoken_name(search_faceset(key,secret,'now.jpg'))
                 if self.face_flag=='' or self.face_flag!=res:
